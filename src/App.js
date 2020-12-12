@@ -2,8 +2,35 @@ import React, { Component } from "react";
 import Navbar from "./components/layout/Navbar";
 import Users from "./components/users/Users";
 import "./CRApp.css";
+import axios from "axios";
 
 class App extends Component {
+  state = {
+    users: [],
+    loading: false,
+  };
+  async componentDidMount() {
+    this.setState({ loading: true });
+
+    const res = await axios.get("https://api.github.com/users");
+
+    console.log(res.data);
+
+    let data = res.data;
+
+    let userNames = [];
+
+    for (const key in data) {
+      let value = data[key];
+      //console.log(value.login);
+      userNames.push(value.login);
+    }
+
+    this.setState({ userNames: userNames, loading: false });
+
+    console.log(this.state);
+  }
+
   render() {
     return (
       <div className="App">
