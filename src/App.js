@@ -7,10 +7,12 @@ import Alert from "./components/layout/Alert";
 import About from "./components/pages/About";
 import "./CRApp.css";
 import axios from "axios";
+import User from "./components/users/User";
 
 class App extends Component {
   state = {
     users: [],
+    user: {},
     loading: false,
     alert: null,
   };
@@ -29,6 +31,8 @@ class App extends Component {
     console.log(this.state.loading);
   }
 
+  // Get GitHub Users
+
   searchUsers = async (text) => {
     this.setState({ loading: true });
     const res = await axios.get(
@@ -38,9 +42,33 @@ class App extends Component {
       ${process.env.REACT_APP_GITHUB_CLIENT_SECRET}}`
     );
 
-    console.log(res.data);
-
     this.setState({ users: res.data.items, loading: false });
+  };
+
+  // Get single Github user
+
+  getUser = async (username) => {
+    this.setState({ loading: true });
+    const res = await axios.get(
+      `https://api.github.com/users/${username}?client_id=
+      ${process.env.REACT_APP_GITHUB_CLIENT_ID}
+      &client_secret=
+      ${process.env.REACT_APP_GITHUB_CLIENT_SECRET}}`
+    );
+    this.setState({ user: res.data, loading: false });
+  };
+
+  // Get users repos
+
+  getUserRepos = async (username) => {
+    this.setState({ loading: true });
+    const res = await axios.get(
+      `https://api.github.com/users/${username}/repos?client_id=
+      ${process.env.REACT_APP_GITHUB_CLIENT_ID}
+      &client_secret=
+      ${process.env.REACT_APP_GITHUB_CLIENT_SECRET}}`
+    );
+    this.setState({ user: res.data, loading: false });
   };
 
   clearUsers = () => {
@@ -53,7 +81,7 @@ class App extends Component {
   };
 
   render() {
-    const { users, loading } = this.state;
+    const { users, loading, user } = this.state;
     const { clearUsers, searchUsers } = this;
 
     return (
@@ -79,6 +107,18 @@ class App extends Component {
                 )}
               />
               <Route exact path="/about" component={About} />
+              <Route
+                exact
+                path="/user/:login"
+                render={(props) => (
+                  <User
+                    {...props}
+                    getUser={this.getUser}
+                    user={user}
+                    loading={loading}
+                  />
+                )}
+              />
             </Switch>
           </div>
         </div>
@@ -86,6 +126,11 @@ class App extends Component {
     );
   }
 }
+
+// CONCERNING TWO APPROACHES TO THE IMPLEMENTATION OF THE 'ROUTE' COMPONENT
+
+// The first approach is neccessary when iteration between the two components
+// is required i.e., when props need to be passed in (as in the first case)
 
 export default App;
 
