@@ -7,10 +7,10 @@ import GithubContext from "../../context/github/githubContext";
 // Curly braces are only required when the component is not a
 // default export
 
-const User = ({ getUserRepos, repos, match }) => {
+const User = ({ match }) => {
   const githubContext = useContext(GithubContext);
 
-  const { getUser, loading, user } = githubContext;
+  const { getUser, loading, user, repos, getUserRepos } = githubContext;
 
   useEffect(() => {
     getUser(match.params.login);
